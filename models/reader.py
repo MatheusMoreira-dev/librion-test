@@ -1,19 +1,20 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
 from infrastructure.connectionDB import Base
 from .user import User
 
-# classe de bibliotecas
-class Library(User, Base):
+class Reader(User, Base):
     
-    __tablename__ = 'library'
+    __tablename__ = 'reader'
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
+    id_library = Column('id_library', ForeignKey('library.id'))
     name = Column('name', String, nullable=False)
     email = Column('email', String, nullable=False, unique=True)
     password = Column('password', String, nullable=False)
     cep = Column('cep', String, nullable=False)
     admin = Column('admin', Boolean, default=False, nullable=False)
 
-    def __init__(self, name: str, email: str, password: str, cep: str):
+    def __init__(self, id_library: int ,name: str, email: str, password: str, cep: str):
         super().__init__(name, email, password, cep)
-        self.admin = True
+        self.id_library = id_library
+        

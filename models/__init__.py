@@ -3,3 +3,4 @@ from .library import Library
 from .user import User
 from .book import Book
 from .category import Category
+from .reader import Reader
