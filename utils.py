@@ -35,6 +35,9 @@ def find_book(isbn: str):
 
     return {
         'title': title,
-        'author': author
+        'author': author,
+        'description': '',
+        'image': '',
+        'age_rating': ''
     }
 

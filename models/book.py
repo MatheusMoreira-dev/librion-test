@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 from infrastructure.connectionDB import Base
 
 # classe de livros
@@ -14,6 +15,8 @@ class Book(Base):
     image = Column('image', String, nullable=False)
     age_rating = Column('age_rating', String, nullable=False)
     isbn =  Column('isbn', String, unique=True, nullable=False)
+
+    copies = relationship('Copy', back_populates='book')
     
     def __init__(self, id_category: int, title: str, author: str, description: str, image: str, age_rating: str, isbn: str):
         self.id_category = id_category

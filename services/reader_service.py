@@ -19,3 +19,9 @@ class ReaderService():
 
         # cria um novo leitor
         r.create(session, new_reader)
+
+    @staticmethod
+    def get_all(session: Session, id_library: int):
+        all_readers = r.get_all(session, id_library)
+        return all_readers
+

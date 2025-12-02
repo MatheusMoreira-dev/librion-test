@@ -18,10 +18,18 @@ class CopyService():
                 book_data = find_book(isbn)
                 title = book_data['title']
                 author = book_data['author']
-                book = Book(1, title, author, '', '', '', isbn)
+                descrption = book_data['description']
+                image = book_data['image']
+                age_rating = book_data['age_rating']
+                book = Book(1, title, author, descrption, image, age_rating, isbn)
                 book = BookRepository.create(session, book)
                 copy = Copy(id_library, book.id, quantity, is_global)
                 CopyRepository.create(session, copy)
                 
             except IsbnNotFoundError as e:
                 raise IsbnNotFoundError(str(e))
+            
+    @staticmethod
+    def get_all(session: Session, id_library: int):
+        all_copies = CopyRepository.get_all(session, id_library)
+        return all_copies
