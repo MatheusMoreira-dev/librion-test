@@ -1,0 +1,2 @@
+class IsbnNotFoundError(Exception):
+    pass
