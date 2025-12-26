@@ -1,4 +1,4 @@
-import requests
+import requests, re, unicodedata
 from exceptions.copy_exception import IsbnNotFoundError
 from fastapi import HTTPException
 from schemas import BookSchema
@@ -25,3 +25,20 @@ def search_book(isbn:str) -> BookSchema:
     book = volumes["items"][0]
 
     return BookSchema.from_api(isbn, book)
+
+# Função para normalizar strings
+def normalize_string(text:str) -> str:
+
+    # Retorne uma string vazia para NONE e FALSE
+    if not text:
+        return ""
+
+    # Separa o acento da letra. Ex: á -> a + ´
+    text = unicodedata.normalize("NFD", text)
+
+    # Percorre o texto em loop e junta apenas:
+    # caracteres com a categoria diferente de "Mn" Mark, Nonspacing (acentos, aspas...)
+    # e que sejam alfanuméricos (isalnum)
+    text = ''.join(c for c in text if unicodedata.category(c) != "Mn" and c.isalnum())
+
+    return text.lower()
