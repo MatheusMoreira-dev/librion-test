@@ -7,7 +7,17 @@ from utils import normalize_string
 class BookService():
 
     @staticmethod
-    def filter_books(session:Session, filters:SearchBook) -> list[Book]:
+    def list_books(cursor:int|None, size:int, session:Session):
+        books = r.list_books(cursor, size, session)
+        next_cursor = books[-1].id if books else None 
+        
+        return {
+            "books": books,
+            "next_cursor": next_cursor
+        }
+
+    @staticmethod
+    def filter_books(filters:SearchBook, session:Session):
         query = r.based_query(session)
 
         if filters.title:
@@ -24,3 +34,7 @@ class BookService():
             query = r.filter_by_libraries(query, filters.library_ids)
 
         return session.execute(query).scalars().all()
+    
+    @staticmethod
+    def get_by_id(id:int, session:Session):
+        return r.get_by_id(session, id)

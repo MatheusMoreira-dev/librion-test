@@ -50,3 +50,7 @@ async def get_all_copies(library_id: int, session: Session = Depends(get_session
     
     except Exception:
         raise HTTPException(status_code=500)
+
+@libraries_router.patch('copies/{id}')
+async def get_copy(library_id:int, session:Session = Depends(get_session)):
+    return

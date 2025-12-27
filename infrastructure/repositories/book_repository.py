@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, exists
+from sqlalchemy import exists
 from models import Book, Copy
-from schemas import SearchBook
 
 # repositório de um livro
 class BookRepository():
@@ -27,8 +26,19 @@ class BookRepository():
         return book
     
     @staticmethod
-    def all_books(session:Session):
-        return session.query(Book).all()
+    def get_by_id(session:Session, id:int):
+        return session.query(Book).where(Book.id == id)
+    
+    @staticmethod
+    def list_books(cursor:int|None, size:int, session:Session):
+        query = session.query(Book)
+
+        if cursor:
+            query = query.filter(Book.id > cursor)
+        
+        books = query.limit(size).all()
+
+        return books
     
     @staticmethod
     def filter_by_title(query, title:str|None):
