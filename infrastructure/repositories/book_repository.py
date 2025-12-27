@@ -1,18 +1,12 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query, joinedload
 from sqlalchemy import exists
-from models import Book, Copy
+from models import Book, Copy, Library
+from schemas import SearchBook
+from utils import normalize_string
 
 # repositório de um livro
 class BookRepository():
-
-    @staticmethod
-    def based_query(session: Session):
-        return session.query(Book)
     
-    @staticmethod
-    def join_book_copies(query):
-        return query.join(Copy)
-
     @staticmethod
     def create(session: Session, book: Book):
         session.add(book)
@@ -27,7 +21,7 @@ class BookRepository():
     
     @staticmethod
     def get_by_id(session:Session, id:int):
-        return session.query(Book).where(Book.id == id)
+        return session.query(Book).where(Book.id == id).first()
     
     @staticmethod
     def list_books(cursor:int|None, size:int, session:Session):
@@ -39,33 +33,58 @@ class BookRepository():
         books = query.limit(size).all()
 
         return books
-    
-    @staticmethod
-    def filter_by_title(query, title:str|None):
+
+    def __filter_by_title(query:Query[Book], title:str|None):
         if not title or title == "":
             return query
         
         return query.where(Book.search_title.contains(title))
         
-    @staticmethod
-    def filter_by_categories(query, category_ids:list[int]|None):
+    def __filter_by_categories(query:Query[Book], category_ids:list[int]|None):
         if not category_ids:
             return query
         
         return query.where(Book.id_category.in_(category_ids))
     
-    @staticmethod
-    def filter_by_libraries(query, library_ids:list[int]|None):
+    def __filter_by_libraries(query:Query[Book], library_ids:list[int]|None):
         if not library_ids:
             return query
 
         return query.where(Copy.id_library.in_(library_ids))
     
-    @staticmethod
-    def availables(query):
+    def __availables(query:Query[Book]):
         return query.where(
             exists().where(
                 (Copy.id_library == Book.id) &
                 (Copy.quantity > 0)
             )
         )
+    
+    @staticmethod
+    def combined_filters(session:Session, filters:SearchBook):
+        query = session.query(Book)
+        
+        if filters.title:
+            query = BookRepository.__filter_by_title(query, normalize_string(filters.title))
+        
+        if filters.category_ids:
+            query = BookRepository.__filter_by_categories(query, filters.category_ids)
+
+        if filters.available:
+            query = BookRepository.__availables(query)
+        
+        if filters.library_ids:
+            query = query.join(Copy)
+            query = BookRepository.__filter_by_libraries(query, filters.library_ids)
+
+        return query.all()
+
+    @staticmethod
+    def list_copies(session:Session, book_id:int):
+        query = (
+            session.query(Copy)
+            .options(joinedload(Copy.library))
+            .filter(Copy.id_book == book_id)
+        )
+        
+        return query.all()

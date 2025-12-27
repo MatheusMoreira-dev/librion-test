@@ -20,19 +20,19 @@ async def get_books(
 @books_router.post("/search")
 async def filter_books(filters:SearchBook, session:Session = Depends(get_session)):
     """Search using a combination of filters."""
-    return BookService.filter_books(session, filters)
+    return BookService.filter_books(filters, session)
 
-@books_router.get("/{id}")
-async def get_book_by_id(id:int, session:Session = Depends(get_session)):
+@books_router.get("/{book_id}")
+async def get_book_by_id(book_id:int, session:Session = Depends(get_session)):
     try:
-        return BookService.get_by_id(id, session)
+        return BookService.get_by_id(book_id, session)
+    except BookNotFound:
+        raise HTTPException(status_code=404)
 
-    except BookNotFound as e:
-        raise HTTPException(status_code=404, detail=str(e))
+@books_router.get("/{book_id}/copies")
+async def get_copies(book_id:int, session:Session = Depends(get_session)):
+    try:
+        return BookService.get_copies(book_id, session)
     
-    except Exception:
-        raise HTTPException(status_code=500)
-
-@books_router.get("/{id}/copies")
-def get_copies():
-    pass
+    except BookNotFound:
+        raise HTTPException(status_code=404)
