@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from infrastructure.dependencies import get_session
 from sqlalchemy.orm import Session
-from models import Reader
 from services import ReaderService, CopyService
-from schemas import CopySchema, ReaderCreate, ReaderResponse
+from schemas import CopyCreate, CopyResponse, ReaderCreate, ReaderResponse
 from exceptions.reader_exception import ReaderAlreadyExistsError
 from exceptions.copy_exception import IsbnNotFoundError
 
@@ -30,10 +29,10 @@ async def get_readers_by_library(library_id: int, session: Session = Depends(get
     except Exception:
         raise HTTPException(status_code=500)
 
-@libraries_router.post('/copies')
-async def create_copy(copy_schema: CopySchema, session: Session = Depends(get_session)):
+@libraries_router.post('/{library_id}/copies', response_model=CopyResponse)
+async def create_copy(library_id:int, new_copy: CopyCreate, session: Session = Depends(get_session)):
     try:
-        CopyService.create(session, copy_schema.id_library, copy_schema.isbn, copy_schema.quantity, copy_schema.is_global)
+        return CopyService.create(session, new_copy, library_id)
 
     except IsbnNotFoundError as e:
         raise HTTPException(status_code=400, detail=str(e))
