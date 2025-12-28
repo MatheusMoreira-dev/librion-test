@@ -25,7 +25,10 @@ class ReaderService():
         return r.create(session, reader)
 
     @staticmethod
-    def get_all(session: Session, id_library: int):
-        all_readers = r.get_all(session, id_library)
-        return all_readers
+    def list_readers_by_library(session: Session, id_library: int):
+        readers = r.list_readers_by_library(session, id_library)
 
+        if not readers:
+            return []
+
+        return readers

@@ -21,11 +21,11 @@ async def create_reader(library_id:int, reader_data: ReaderCreate, session: Sess
     except Exception:
         raise HTTPException(status_code=500)
 
-@libraries_router.get('/readers')
-async def get_all_readers(library_id: int, session: Session = Depends(get_session)):
+@libraries_router.get('{library_id}/readers', response_model=list[ReaderResponse])
+async def get_readers_by_library(library_id: int, session: Session = Depends(get_session)):
+    """List of readers of a library"""
     try:
-        all_readers = ReaderService.get_all(session, library_id)
-        return all_readers
+        return ReaderService.list_readers_by_library(session, library_id)
     
     except Exception:
         raise HTTPException(status_code=500)
