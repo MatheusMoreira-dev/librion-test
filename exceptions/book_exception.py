@@ -1,2 +1,2 @@
-class BookNotFound(Exception):
+class BookNotFoundError(Exception):
     pass

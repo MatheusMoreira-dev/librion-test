@@ -20,7 +20,7 @@ class BookRepository():
         return book
     
     @staticmethod
-    def get_by_id(session:Session, id:int):
+    def get_by_id(id:int, session:Session):
         return session.query(Book).where(Book.id == id).first()
     
     @staticmethod
@@ -61,7 +61,7 @@ class BookRepository():
         )
     
     @staticmethod
-    def combined_filters(session:Session, filters:SearchBook):
+    def combined_filters(filters:SearchBook, session:Session):
         query = session.query(Book)
         
         if filters.title:
@@ -80,7 +80,7 @@ class BookRepository():
         return query.all()
 
     @staticmethod
-    def list_copies(session:Session, book_id:int):
+    def list_copies(book_id:int, session:Session):
         query = (
             session.query(Copy)
             .options(joinedload(Copy.library))
