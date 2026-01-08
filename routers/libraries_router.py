@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from infrastructure.dependencies import get_session
 from sqlalchemy.orm import Session
 from services import ReaderService, CopyService
-from schemas import CopyCreate, CopyResponse, ReaderCreate, ReaderResponse, LoanRequest
+from schemas import CopyCreate, CopyResponse, ReaderCreate, ReaderResponse
 from exceptions.reader_exception import ReaderAlreadyExistsError
 from exceptions.copy_exception import IsbnNotFoundError
 
@@ -57,11 +57,6 @@ async def create_copy(library_id:int, new_copy: CopyCreate, session: Session = D
 # Obter um exemplar pelo id
 @libraries_router.get("/{library_id}/copies/{copy_id}")
 async def get_copy_by_id():
-    pass
-
-# Solicitar empréstimo do exemplar 
-@libraries_router.post("/{library_id}/copies/{copy_id}/loan")
-async def loan_copy(loanRequest: LoanRequest, session: Session = Depends(get_session)):
     pass
 
 # Lista os exemplares de uma biblioteca

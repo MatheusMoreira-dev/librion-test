@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, Query, joinedload
 from sqlalchemy import exists
 from models import Book, Copy, Library
-from schemas import SearchBook
+from schemas import BookSearch
 from utils import normalize_string
 
 # repositório de um livro
@@ -61,7 +61,7 @@ class BookRepository():
         )
     
     @staticmethod
-    def combined_filters(filters:SearchBook, session:Session):
+    def combined_filters(filters:BookSearch, session:Session):
         query = session.query(Book)
         
         if filters.title:

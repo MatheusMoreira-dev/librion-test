@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from infrastructure.repositories import BookRepository as r
-from schemas import SearchBook
+from schemas import BookSearch
 from exceptions.book_exception import BookNotFoundError
 
 class BookService():
@@ -16,7 +16,7 @@ class BookService():
         }
 
     @staticmethod
-    def filter_books(filters:SearchBook, session:Session):
+    def filter_books(filters:BookSearch, session:Session):
         return r.combined_filters(filters, session)
     
     @staticmethod

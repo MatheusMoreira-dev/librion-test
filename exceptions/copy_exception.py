@@ -6,6 +6,3 @@ class CopyNotFoundError(Exception):
 
 class CopyNotAvailableError(Exception):
     pass
-
-class LoanOfCopyDenied(Exception):
-    pass
