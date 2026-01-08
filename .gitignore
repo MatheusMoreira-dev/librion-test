@@ -209,3 +209,5 @@ __marimo__/
 alembic.ini
 alembic/
 requirements2.txt
+
+database.db
