@@ -3,7 +3,7 @@ from infrastructure.dependencies import get_session
 from sqlalchemy.orm import Session
 from models import Library
 from services import LibraryService
-from schemas import LibrarySchema
+from schemas import LibrarySchema, LoginSchema
 from exceptions.library_exception import LibraryAlreadyExistsError
 
 auth_router = APIRouter(prefix='/auth', tags=['auth'])
@@ -20,3 +20,6 @@ async def create_library(library_schema: LibrarySchema, session: Session = Depen
     
     except Exception:
         raise HTTPException(status_code=500)
+    
+async def login(login_schema: LoginSchema, session: Session = Depends(get_session)):
+    pass
