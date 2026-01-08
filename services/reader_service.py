@@ -6,7 +6,6 @@ from schemas import ReaderCreate
 from exceptions.reader_exception import ReaderAlreadyExistsError
 
 class ReaderService():
-
     # método para cirar um novo leitor
     @staticmethod
     def create(session:Session, reader_data:ReaderCreate, library_id:int):

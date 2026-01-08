@@ -3,6 +3,11 @@ from models import Copy
 
 # repositório de exemplar
 class CopyRepository():
+    
+    @staticmethod
+    def find_copy(session: Session, copy_id):
+        query = session.query(Copy).filter(Copy.id == copy_id).first()
+        return query
 
     @staticmethod
     def create(session: Session, copy: Copy):
