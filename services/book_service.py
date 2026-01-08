@@ -21,7 +21,7 @@ class BookService():
     
     @staticmethod
     def get_by_id(book_id:int, session:Session):
-        book = r.get_by_id(book_id, session)
+        book = r.find_by_id(book_id, session)
 
         if not book:
             raise BookNotFoundError()
