@@ -7,10 +7,17 @@ from schemas import CopyCreate, CopyResponse, ReaderCreate, ReaderResponse
 from exceptions.reader_exception import ReaderAlreadyExistsError
 from exceptions.copy_exception import IsbnNotFoundError
 
-libraries_router = APIRouter(prefix='/libraries', tags=['libraries'], dependencies=[Depends(get_current_library)])
+libraries_router = APIRouter(prefix='/libraries', tags=['Libraries'], dependencies=[Depends(get_current_library)])
+
+# Obtém a lista de bibliotecas cadastradas
+@libraries_router.get("/")
+async def list_libraries():
+    pass
+
+#<------------------Leitores--------------------->
 
 # Cadastra um leitor associado a uma biblioteca
-@libraries_router.post('/readers', response_model=ReaderResponse, status_code=201)
+@libraries_router.post('/me/readers', response_model=ReaderResponse, status_code=201)
 async def create_reader(reader_data: ReaderCreate, library: Library = Depends(get_current_library), session: Session = Depends(get_session)):
     """Cadastra um novo leitor no sistema"""
     try:
@@ -22,13 +29,8 @@ async def create_reader(reader_data: ReaderCreate, library: Library = Depends(ge
     except Exception:
         raise HTTPException(status_code=500)
 
-# Obtém um leitor pelo id
-@libraries_router.get('/{library_id}/readers/{reader_id}')
-async def get_reader_by_id():
-    pass
-
 # Lista os leitores de uma biblioteca
-@libraries_router.get('/readers', response_model=list[ReaderResponse])
+@libraries_router.get('/me/readers', response_model=list[ReaderResponse])
 async def get_readers_by_library(library: Library = Depends(get_current_library), session: Session = Depends(get_session)):
     """Lista todos os leitores cadastrados por uma biblioteca"""
     try:
@@ -37,13 +39,20 @@ async def get_readers_by_library(library: Library = Depends(get_current_library)
     except Exception:
         raise HTTPException(status_code=500)
 
+# Obtém um leitor pelo id
+@libraries_router.get('/me/readers/{reader_id}')
+async def get_reader_by_id():
+    pass
+
 # Edita um leitor
-@libraries_router.patch("/{library_id}/readers/{reader_id}")
+@libraries_router.patch("/me/readers/{reader_id}")
 async def patch_reader():
     pass
 
+# <------------------Cópias--------------------->
+
 # Cadastra o exemplar de um livro na biblioteca
-@libraries_router.post('/copies', response_model=CopyResponse)
+@libraries_router.post("/me/copies", response_model=CopyResponse)
 async def create_copy(new_copy: CopyCreate, library: Library = Depends(get_current_library), session: Session = Depends(get_session)):
     """Cadastra o exemplar de um livro em uma biblioteca"""
     try:
@@ -55,13 +64,8 @@ async def create_copy(new_copy: CopyCreate, library: Library = Depends(get_curre
     except Exception:
         raise HTTPException(status_code=500)
 
-# Obter um exemplar pelo id
-@libraries_router.get("/{library_id}/copies/{copy_id}")
-async def get_copy_by_id():
-    pass
-
 # Lista os exemplares de uma biblioteca
-@libraries_router.get('copies/')
+@libraries_router.get("/me/copies")
 async def get_all_copies(library: Library = Depends(get_current_library), session: Session = Depends(get_session)):
     try:
         all_copies = CopyService.get_all(session, library.id)
@@ -69,3 +73,18 @@ async def get_all_copies(library: Library = Depends(get_current_library), sessio
     
     except Exception:
         raise HTTPException(status_code=500)
+
+# Obter um exemplar pelo id
+@libraries_router.get("/me/copies/{copy_id}")
+async def get_copy_by_id():
+    pass
+
+# <------------------Empréstimos--------------------->
+
+@libraries_router.get("/me/loans")
+async def get_all_loans():
+    pass
+
+@libraries_router.get("/me/loans/{loan_id}")
+async def get_loan_by_id():
+    pass
