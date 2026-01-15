@@ -3,9 +3,10 @@ from infrastructure.dependencies import get_session, get_current_library
 from sqlalchemy.orm import Session
 from models import Library
 from services import ReaderService, CopyService
-from schemas import CopyCreate, CopyResponse, ReaderCreate, ReaderResponse
-from exceptions.reader_exception import ReaderAlreadyExistsError
+from schemas import CopyCreate, CopyResponse, ReaderCreate, ReaderResponse, ReaderUpdate
+from exceptions.reader_exception import ReaderAlreadyExistsError, ReaderNotFoundError
 from exceptions.copy_exception import IsbnNotFoundError
+from exceptions.login_exception import AccessDeniedError
 
 libraries_router = APIRouter(prefix='/libraries', tags=['Libraries'], dependencies=[Depends(get_current_library)])
 
@@ -40,14 +41,37 @@ async def get_readers_by_library(library: Library = Depends(get_current_library)
         raise HTTPException(status_code=500)
 
 # Obtém um leitor pelo id
-@libraries_router.get('/me/readers/{reader_id}')
-async def get_reader_by_id():
-    pass
+@libraries_router.get('/me/readers/{reader_id}', response_model=ReaderResponse)
+async def get_reader_by_id(reader_id: int, library: Library = Depends(get_current_library), session: Session = Depends(get_session)):
+    try:
+        reader = ReaderService.find_reader_in_library(session, reader_id, library.id)
+
+        return reader
+
+    except ReaderNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+    except AccessDeniedError as e:
+        raise HTTPException(status_code=403, detail=str(e))
+    
+    except Exception:
+        raise HTTPException(status_code=500)
 
 # Edita um leitor
-@libraries_router.patch("/me/readers/{reader_id}")
-async def patch_reader():
-    pass
+@libraries_router.patch("/me/readers/{reader_id}", response_model=ReaderResponse)
+async def patch_reader(reader_id: int, reader_data: ReaderUpdate, library: Library = Depends(get_current_library), session: Session = Depends(get_session)):
+    try:
+        reader = ReaderService.update(session, reader_id, reader_data, library.id)
+        return reader
+
+    except ReaderNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+    except AccessDeniedError as e:
+        raise HTTPException(status_code=403, detail=str(e))
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # <------------------Cópias--------------------->
 

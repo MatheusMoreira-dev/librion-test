@@ -119,4 +119,3 @@ async def use_refresh_token(user: User = Depends(verify_token)):
 
     except Exception:
         raise HTTPException(status_code=500)
-
