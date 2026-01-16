@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 from models import Loan
-from services import ReaderService, CopyService
+from services import ReaderService, CopyService, LibraryService
 from exceptions.copy_exception import CopyOutOfStock
-from exceptions.loan_exception import LoanDenied
+from exceptions.loan_exception import LoanDenied, LoanNotFound
+from exceptions.login_exception import AccessDeniedError
 from infrastructure.repositories import LoanRepository
 
 class LoanService():
@@ -35,4 +36,44 @@ class LoanService():
     def list_reader_loans(reader_id:int, session:Session):
         # Busca o leitor no banco, caso não exista, raise exception
         reader = ReaderService.find_reader(session, reader_id)
-        return LoanRepository.list_reader_loans(session, reader.id)
+        return LoanRepository.list_reader_loans(session, reader_id)
+    
+    @staticmethod
+    def list_library_loans(library_id:int, session:Session):
+        # Busca a biblioteca, caso der erro, dá um raise
+        library = LibraryService.get_library_by_id(session, library_id)
+        return LoanRepository.list_library_loans(session, library_id)
+    
+    @staticmethod
+    def get_reader_loan(reader_id:int, loan_id:int, session:Session):
+        loan = LoanRepository.get_loan_by_id(session, loan_id)
+
+        if not loan:
+            raise LoanNotFound(str("Empréstimo não encontrado"))
+        
+        if loan.reader_id != reader_id:
+            raise AccessDeniedError(str("Você não tem permissão de acessar esse recurso!"))
+        
+        return loan
+    
+    @staticmethod
+    def get_library_loan(library_id:int, loan_id:int, session:Session):
+        loan = LoanRepository.get_loan_by_id(session, loan_id)
+
+        if not loan:
+            raise LoanNotFound(str("Empréstimo não encontrado"))
+        
+        copy = CopyService.find_copy(session, loan.copy_id)
+
+        if copy.id_library != library_id:
+            raise AccessDeniedError(str("Você não tem permissão de acessar esse recurso!"))
+        
+        return loan
+    
+    @staticmethod
+    def register_taken_date():
+        pass
+    
+    @staticmethod
+    def register_return_date():
+        pass

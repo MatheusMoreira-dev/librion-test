@@ -1,22 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException
-from infrastructure.dependencies import get_session, get_current_reader, get_current_library
+from infrastructure.dependencies import get_session, get_current_reader
 from sqlalchemy.orm import Session
-from models import Reader, Library
+from models import Reader
 from services import LoanService
-from exceptions.loan_exception import LoanDenied
+from exceptions.loan_exception import LoanDenied, LoanNotFound
 from exceptions.copy_exception import CopyOutOfStock, CopyNotFoundError
 from exceptions.reader_exception import ReaderNotFoundError
+from exceptions.login_exception import AccessDeniedError
 
-loans_router = APIRouter(prefix="/loans", tags=["Loan"])
+readers_router = APIRouter(prefix="/readers", tags=["Readers"])
 
-# (BIBLIOTECA) - Lista de empréstimos de uma biblioteca
-@loans_router.get("/")
-async def list_library_loans(library:Library = Depends(get_current_library), session: Session = Depends(get_session)):
-    """Lista de todos os empréstimos de uma biblioteca"""
+# Retornar dados do leitor 
+@readers_router.get("/me")
+async def get_profile():
     pass
 
-# (LEITOR) - Lista de empréstimos de um leitor
-@loans_router.get("/me")
+# Listar todos os empréstimos de um leitor
+@readers_router.get("/me/loans")
 async def list_reader_loans(reader: Reader = Depends(get_current_reader), session: Session = Depends(get_session)):
     """Lista de todos os empréstimos de um leitor"""
     try:
@@ -28,9 +28,9 @@ async def list_reader_loans(reader: Reader = Depends(get_current_reader), sessio
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# (LEITOR) - Solicitação de empréstimo
-@loans_router.post("/")
-async def request_loan(copy_id:int, session:Session = Depends(get_session), reader:Reader = Depends(get_current_reader)):
+# Sollicitar um empréstimo
+@readers_router.post("/me/loans")
+async def request_loan(copy_id:int, reader:Reader = Depends(get_current_reader), session:Session = Depends(get_session)):
     """Solicitar o empréstimo de um exemplar (cópia)"""
     try:
         return LoanService.request_loan(copy_id, reader.id, session)
@@ -47,17 +47,21 @@ async def request_loan(copy_id:int, session:Session = Depends(get_session), read
     except LoanDenied as e:
         raise HTTPException(status_code=403, detail=str(e))
 
-# (LEITOR) - Visualizar empréstimo
-@loans_router.get("/{id_loan}")
-async def get_loan_by_id(session: Session = Depends(get_session)):
-    pass
+# Visualizar empréstimo
+@readers_router.get("/me/loans/{loan_id}")
+async def get_loan_by_id(loan_id:int, reader:Reader = Depends(get_current_reader), session: Session = Depends(get_session)):
+    try:
+        return LoanService.get_reader_loan(reader.id, loan_id, session)
+    
+    except LoanNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+    except AccessDeniedError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+    except Exception:
+        raise HTTPException(status_code=500)
 
-# (BIBLIOTECA) - Registra a data em que foi retirado o livro
-@loans_router.patch("/{id_loan}/register-taken-date")
-async def register_taken_date():
-    pass
-
-# (BIBLIOTECA) - Registra a data de devolução
-@loans_router.patch("/{id_loan}/register-return-date")
-async def register_return_date():
+@readers_router.patch("/me/loans/{loan_id}/renew")
+async def renew_loan():
     pass

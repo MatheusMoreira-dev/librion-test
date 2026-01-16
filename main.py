@@ -19,13 +19,13 @@ bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_schema =  OAuth2PasswordBearer(tokenUrl='auth/login-form')  
 
 # importando os roteadores
-from routers import auth_router, libraries_router, books_router, loans_router
+from routers import auth_router, libraries_router, books_router, readers_router
 
 # incluindo as rotas
 app.include_router(auth_router)
 app.include_router(libraries_router)
 app.include_router(books_router)
-app.include_router(loans_router)
+app.include_router(readers_router)
 
 # para rodar o nosso código, executar no terminal: uvicorn main:app --reload
 
