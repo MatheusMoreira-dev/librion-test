@@ -16,3 +16,9 @@ class LoanRepository:
         query = session.query(Loan).filter(Loan.reader_id == reader_id)
         
         return query.all()
+    
+    @staticmethod
+    def get_loan_by_id(session:Session, loan_id:int):
+        query = session.query(Loan).filter(Loan.id == loan_id)
+
+        return query.first()

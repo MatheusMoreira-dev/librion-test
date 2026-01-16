@@ -2,11 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from infrastructure.dependencies import get_session, get_current_library
 from sqlalchemy.orm import Session
 from models import Library
-from services import ReaderService, CopyService, LibraryService
+from services import ReaderService, CopyService, LibraryService, LoanService
 from schemas import CopyCreate, CopyResponse, ReaderCreate, ReaderResponse, ReaderUpdate,LibraryResponse
 from exceptions.reader_exception import ReaderAlreadyExistsError, ReaderNotFoundError
 from exceptions.copy_exception import IsbnNotFoundError, CopyAlreadyExistsError, CopyNotFoundError
 from exceptions.login_exception import AccessDeniedError
+from exceptions.loan_exception import LoanNotFound
 
 libraries_router = APIRouter(prefix='/libraries', tags=['Libraries'], dependencies=[Depends(get_current_library)])
 
@@ -19,7 +20,6 @@ async def list_libraries(session: Session = Depends(get_session)):
     except Exception:
         raise HTTPException(status_code=500)
     
-
 #<------------------Leitores--------------------->
 
 # Cadastra um leitor associado a uma biblioteca
@@ -141,9 +141,29 @@ async def get_copy_by_id(copy_id: int, library: Library = Depends(get_current_li
 # <------------------Empréstimos--------------------->
 
 @libraries_router.get("/me/loans")
-async def get_all_loans():
+async def get_all_loans(library:Library = Depends(get_current_library), session: Session = Depends(get_session)):
     pass
 
 @libraries_router.get("/me/loans/{loan_id}")
-async def get_loan_by_id():
+async def get_loan_by_id(loan_id:int, library:Library = Depends(get_current_library), session: Session = Depends(get_session)):
+    try:
+        return LoanService.get_reader_loan(library.id, loan_id, session)
+    
+    except LoanNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+    except AccessDeniedError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+    except Exception:
+        raise HTTPException(status_code=500)
+
+# Registra a data em que foi retirado o livro
+@libraries_router.patch("/me/loans/{id_loan}/register-taken-date")
+async def register_taken_date():
+    pass
+
+# (BIBLIOTECA) - Registra a data de devolução
+@libraries_router.patch("/me/loans/{id_loan}/register-return-date")
+async def register_return_date():
     pass
