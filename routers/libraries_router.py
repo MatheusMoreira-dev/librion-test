@@ -5,7 +5,7 @@ from models import Library
 from services import ReaderService, CopyService, LibraryService
 from schemas import CopyCreate, CopyResponse, ReaderCreate, ReaderResponse, ReaderUpdate,LibraryResponse
 from exceptions.reader_exception import ReaderAlreadyExistsError, ReaderNotFoundError
-from exceptions.copy_exception import IsbnNotFoundError
+from exceptions.copy_exception import IsbnNotFoundError, CopyAlreadyExistsError, CopyNotFoundError
 from exceptions.login_exception import AccessDeniedError
 
 libraries_router = APIRouter(prefix='/libraries', tags=['Libraries'], dependencies=[Depends(get_current_library)])
@@ -91,8 +91,8 @@ async def delete_reader(reader_id: int, library: Library = Depends(get_current_l
     except AccessDeniedError as e:
         raise HTTPException(status_code=403, detail=str(e))
     
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500)
 
 # <------------------Cópias--------------------->
 
@@ -103,8 +103,12 @@ async def create_copy(new_copy: CopyCreate, library: Library = Depends(get_curre
     try:
         return CopyService.create(session, new_copy, library.id)
 
-    except IsbnNotFoundError as e:
+    except CopyAlreadyExistsError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+    except IsbnNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
     
     except Exception:
         raise HTTPException(status_code=500)
@@ -121,8 +125,18 @@ async def get_all_copies(library: Library = Depends(get_current_library), sessio
 
 # Obter um exemplar pelo id
 @libraries_router.get("/me/copies/{copy_id}")
-async def get_copy_by_id():
-    pass
+async def get_copy_by_id(copy_id: int, library: Library = Depends(get_current_library), session: Session = Depends(get_session)):
+    try:
+        copy = CopyService.find_copy_in_library(session, copy_id, library.id)
+        return copy
+    except AccessDeniedError as e:
+        raise HTTPException(status_code=403, detail=str(e))
+    
+    except CopyNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+    except Exception as e :
+        raise HTTPException(status_code=500, detail=str(e))
 
 # <------------------Empréstimos--------------------->
 

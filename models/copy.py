@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, Boolean, ForeignKey,UniqueConstraint
 from sqlalchemy.orm import relationship
 from infrastructure.connectionDB import Base
 
@@ -15,7 +15,15 @@ class Copy(Base):
     is_global = Column('is_global', Boolean, nullable=False)
 
     book = relationship('Book', back_populates='copies')
-    library = relationship('Library', uselist=False)
+    library = relationship('Library', back_populates='copies')
+
+    __table_args__ = (
+        UniqueConstraint(
+            "id_library",
+            "id_book",
+            name="uq_library_book"
+        ),
+    )
     
     def __init__(self, id_library: int, id_book: int, quantity: int, is_global: bool):
         self.id_library = id_library

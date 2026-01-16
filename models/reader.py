@@ -1,6 +1,5 @@
 from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
 from infrastructure.connectionDB import Base
-from main import bcrypt_context
 from .user import User
 from schemas import ReaderUpdate
 

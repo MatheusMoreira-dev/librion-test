@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from infrastructure.repositories import CopyRepository, BookRepository
 from models import Copy, Book
-from exceptions.copy_exception import IsbnNotFoundError, CopyNotFoundError, CopyOutOfStock
+from exceptions.copy_exception import IsbnNotFoundError, CopyNotFoundError, CopyOutOfStock, CopyAlreadyExistsError
+from exceptions.login_exception import AccessDeniedError
 from utils import search_book
 from schemas import CopyCreate
 
@@ -9,6 +10,11 @@ class CopyService():
 
     @staticmethod
     def create(session: Session, data_copy:CopyCreate, library_id:int):
+        copy_already_exists = CopyRepository.find_by_isbn(session, data_copy.isbn, library_id)
+
+        if copy_already_exists:
+            raise CopyAlreadyExistsError('Exemplar já cadastrado!')
+
         book = BookRepository.find_by_isbn(session, data_copy.isbn)
 
         if book:
@@ -38,6 +44,20 @@ class CopyService():
         # Erro: O exemplar não foi encontrado
         if not copy:
             raise CopyNotFoundError(str("Exemplar não encontrado!"))
+        
+        return copy
+    
+    @staticmethod
+    def find_copy_in_library(session: Session, copy_id:int, library_id: int):
+         # Busca o exemplar no banco de dados
+        copy = CopyRepository.find_copy_join_book(session, copy_id)
+
+        # Erro: O exemplar não foi encontrado
+        if not copy:
+            raise CopyNotFoundError(str("Exemplar não encontrado!"))
+
+        if copy.id_library != library_id:
+            raise AccessDeniedError('Você não tem acesso a esse exemplar!')
         
         return copy
 

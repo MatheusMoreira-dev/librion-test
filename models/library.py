@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy.orm import relationship
 from infrastructure.connectionDB import Base
 from .user import User
 
@@ -13,6 +14,8 @@ class Library(User, Base):
     password = Column('password', String, nullable=False)
     cep = Column('cep', String, nullable=False)
     admin = Column('admin', Boolean, default=False, nullable=False)
+
+    copies = relationship('Copy', back_populates='library')
 
     def __init__(self, name: str, email: str, password: str, cep: str):
         super().__init__(name, email, password, cep)
