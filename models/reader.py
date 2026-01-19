@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 from infrastructure.connectionDB import Base
 from .user import User
 from schemas import ReaderUpdate
@@ -15,6 +16,8 @@ class Reader(User, Base):
     password = Column('password', String, nullable=False)
     cep = Column('cep', String, nullable=False)
     admin = Column('admin', Boolean, default=False, nullable=False)
+
+    library = relationship('Library')
 
     def __init__(self, id_library: int, name: str, email: str, password: str, cep: str):
         super().__init__(name, email, password, cep)

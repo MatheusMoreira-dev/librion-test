@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from schemas import LibraryResponse
+from schemas.library_schema import LibraryResponse
+from schemas.book_schema import BookSchema
 
 class CopyBase(BaseModel):
     quantity: int
@@ -17,7 +18,7 @@ class CopyCreate(CopyBase):
 
 class CopyResponse(CopyBase):
     library:LibraryResponse
-    id_book:int
+    book: BookSchema
     
     class Config:
         from_attributes = True

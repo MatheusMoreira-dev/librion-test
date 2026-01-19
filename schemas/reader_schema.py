@@ -1,5 +1,6 @@
 from pydantic import BaseModel, field_validator
 from pydantic_core import PydanticUndefined
+from schemas.library_schema import LibraryResponse
 
 class ReaderBase(BaseModel):
     name: str
@@ -34,7 +35,7 @@ class ReaderUpdate(BaseModel):
 
 class ReaderResponse(ReaderBase):
     id: int
-    id_library: int
+    library: LibraryResponse
 
     class Config:
         from_attributes = True

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from schemas import CopyResponse
+from schemas.copy_schema import CopyResponse
 from datetime import datetime
 
 class LoanRequest(BaseModel):
