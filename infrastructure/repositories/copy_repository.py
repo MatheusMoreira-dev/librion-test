@@ -25,6 +25,11 @@ class CopyRepository():
         session.commit()
 
         return copy
+    
+    @staticmethod
+    def delete(session: Session, copy: Copy):
+        session.delete(copy)
+        session.commit()
 
     @staticmethod
     def get_all(session: Session, id_library: int):

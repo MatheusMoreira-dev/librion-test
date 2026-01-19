@@ -154,6 +154,21 @@ async def get_copy_by_id(copy_id: int, library: Library = Depends(get_current_li
     except Exception as e :
         raise HTTPException(status_code=500, detail=str(e))
 
+@libraries_router.delete("/me/copies/{copy_id}")
+async def delete_copy(copy_id: int, library: Library = Depends(get_current_library), session: Session = Depends(get_session)):
+    try:
+        copy = CopyService.delete(session, copy_id, library.id)
+        
+        return True
+    except AccessDeniedError as e:
+        raise HTTPException(status_code=403, detail=str(e))
+    
+    except CopyNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+    except Exception as e :
+        raise HTTPException(status_code=500, detail=str(e))
+
 # <------------------Empréstimos--------------------->
 
 # Retornar todos os emprëstimos de uma biblioteca

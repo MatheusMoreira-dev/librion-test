@@ -30,7 +30,14 @@ class CopyService():
                 
             except IsbnNotFoundError as e:
                 raise IsbnNotFoundError(str(e))
-            
+
+    # deleta um exemplar 
+    @staticmethod
+    def delete(session: Session, copy_id: int, library_id: int):
+        copy = CopyService.find_copy_in_library(session, copy_id, library_id)
+
+        CopyRepository.delete(session, copy)
+
     @staticmethod
     def get_all(session: Session, id_library: int):
         all_copies = CopyRepository.get_all(session, id_library)

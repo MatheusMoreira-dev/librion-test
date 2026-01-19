@@ -21,7 +21,7 @@ class ReaderUpdate(BaseModel):
     cep: str | None = None
 
     @field_validator('name', 'email', 'cep', mode='before')
-    @classmethod
+    @classmethod 
     def ignore_empty_or_null(cls, value):
         if value is None:
             return PydanticUndefined
