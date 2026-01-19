@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from models import Reader
 from services import LoanService, ReaderService
 from schemas import LoanRequest, LoanResponse, ReaderResponse
-from exceptions.loan_exception import LoanDenied, LoanNotFound
+from exceptions.loan_exception import LoanDenied, AlreadyRequestedError
 from exceptions.copy_exception import CopyOutOfStock, CopyNotFoundError
 from exceptions.reader_exception import ReaderNotFoundError
 from exceptions.login_exception import AccessDeniedError
@@ -54,6 +54,9 @@ async def request_loan(loan_request: LoanRequest, reader:Reader = Depends(get_cu
     
     except LoanDenied as e:
         raise HTTPException(status_code=403, detail=str(e))
+    
+    except AlreadyRequestedError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     
     except Exception:
         raise HTTPException(status_code=500)

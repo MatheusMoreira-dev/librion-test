@@ -3,3 +3,6 @@ class LoanDenied(Exception):
 
 class LoanNotFound(Exception):
     pass
+
+class AlreadyRequestedError(Exception):
+    pass

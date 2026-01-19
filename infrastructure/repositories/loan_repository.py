@@ -12,6 +12,11 @@ class LoanRepository:
         return loan
     
     @staticmethod
+    def find_loan_by_copy(session: Session, copy_id: int, reader_id: int):
+        loan = session.query(Loan).filter(Loan.copy_id == copy_id, Loan.reader_id == reader_id).first()
+        return loan
+
+    @staticmethod
     def list_reader_loans(session:Session, reader_id:int):
         query = session.query(Loan).filter(Loan.reader_id == reader_id)
         

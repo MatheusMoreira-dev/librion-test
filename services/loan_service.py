@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from models import Loan
 from services import ReaderService, CopyService, LibraryService
 from exceptions.copy_exception import CopyOutOfStock
-from exceptions.loan_exception import LoanDenied, LoanNotFound
+from exceptions.loan_exception import LoanDenied, LoanNotFound, AlreadyRequestedError
 from exceptions.login_exception import AccessDeniedError
 from infrastructure.repositories import LoanRepository
 
@@ -12,6 +12,12 @@ class LoanService():
     def request_loan(copy_id:int, reader_id:int, session:Session):
         # Busca o exemplar no banco de dados
         copy = CopyService.find_copy(session, copy_id)
+
+        # verifica se o leitor já pegou emprestado o exemplar
+        loan = LoanService.find_loan_by_copy(copy_id, reader_id, session)
+
+        if loan and loan.active:
+            raise AlreadyRequestedError('Você já está com um empréstimo solicitado para esse exemplar.')
 
         # Erro: Não há exemplar disponível
         if copy.quantity_available == 0:
@@ -32,6 +38,11 @@ class LoanService():
         
         return loan
     
+    @staticmethod
+    def find_loan_by_copy(copy_id: int, reader_id: int, session: Session):
+        loan = LoanRepository.find_loan_by_copy(session, copy_id, reader_id)
+        return loan
+
     @staticmethod
     def list_reader_loans(reader_id:int, session:Session):
         # Busca o leitor no banco, caso não exista, raise exception
