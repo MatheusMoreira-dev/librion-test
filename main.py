@@ -28,7 +28,3 @@ app.include_router(books_router)
 app.include_router(readers_router)
 
 # para rodar o nosso código, executar no terminal: uvicorn main:app --reload
-
-# 9788571646858
-# 9788522031450
-# 8580575397

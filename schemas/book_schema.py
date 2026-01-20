@@ -32,3 +32,13 @@ class BookSearch(BaseModel):
     category_ids:list[int]|None = None
     library_ids:list[int]|None = None
     available:bool|None = None
+
+class BookResponse(BaseModel):
+    id: int
+    id_category:int|None = None
+    title:str
+    author:str
+    description:str
+    image:str
+    age_rating:str
+    isbn:str

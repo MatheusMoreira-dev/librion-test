@@ -6,3 +6,4 @@ class User():
         self.password = password
         self.cep = cep
         self.admin = False
+    

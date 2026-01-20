@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 from models import Loan
 from services import ReaderService, CopyService, LibraryService
+from infrastructure.repositories import LoanRepository
 from exceptions.copy_exception import CopyOutOfStock
 from exceptions.loan_exception import LoanDenied, LoanNotFound, AlreadyRequestedError
 from exceptions.login_exception import AccessDeniedError
-from infrastructure.repositories import LoanRepository
 
 class LoanService():
     

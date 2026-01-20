@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from infrastructure.dependencies import get_session
 from sqlalchemy.orm import Session
 from services import BookService, CopyService

@@ -36,3 +36,4 @@ class LoanRepository:
     @staticmethod
     def register_taken_date(session:Session, loan_id:int):
         query = session.query(Loan).filter(Loan.id == loan_id).first()
+        

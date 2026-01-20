@@ -22,10 +22,3 @@ class Reader(User, Base):
     def __init__(self, id_library: int, name: str, email: str, password: str, cep: str):
         super().__init__(name, email, password, cep)
         self.id_library = id_library
-        
-    def update(self, data: ReaderUpdate):
-        self.name = data.name
-        self.email = data.email
-        self.cep = data.cep
-        self.password = data.password
-

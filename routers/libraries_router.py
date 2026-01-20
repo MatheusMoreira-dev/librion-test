@@ -22,8 +22,8 @@ async def list_libraries(session: Session = Depends(get_session)):
         raise HTTPException(status_code=500)
     
 # Obtém perfil de biblioteca autenticada
-@libraries_router.get("/me")
-async def get_auth_library(library: Library = Depends(get_current_library), session: Session = Depends(get_session)):
+@libraries_router.get("/me", response_model=LibraryResponse)
+async def get_profile(library: Library = Depends(get_current_library), session: Session = Depends(get_session)):
     try:
         return LibraryService.get_library_by_id(session, library.id)
     
@@ -130,7 +130,7 @@ async def create_copy(new_copy: CopyCreate, library: Library = Depends(get_curre
         raise HTTPException(status_code=500)
 
 # Lista os exemplares de uma biblioteca
-@libraries_router.get("/me/copies")
+@libraries_router.get("/me/copies", response_model=list[CopyResponse])
 async def get_all_copies(library: Library = Depends(get_current_library), session: Session = Depends(get_session)):
     try:
         all_copies = CopyService.get_all(session, library.id)
@@ -140,7 +140,7 @@ async def get_all_copies(library: Library = Depends(get_current_library), sessio
         raise HTTPException(status_code=500)
 
 # Obter um exemplar pelo id
-@libraries_router.get("/me/copies/{copy_id}")
+@libraries_router.get("/me/copies/{copy_id}", response_model=CopyResponse)
 async def get_copy_by_id(copy_id: int, library: Library = Depends(get_current_library), session: Session = Depends(get_session)):
     try:
         copy = CopyService.find_copy_in_library(session, copy_id, library.id)

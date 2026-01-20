@@ -7,11 +7,6 @@ from schemas import ReaderUpdate
 class ReaderRepository():
 
     @staticmethod
-    def find_reader_by_id(session: Session, id_reader:int):
-        query = session.query(Reader).filter(Reader.id == id_reader).first()
-        return query
-
-    @staticmethod
     def create(session: Session, reader: Reader):
         # cria senha criptografada
         reader.password = bcrypt_context.hash(reader.password)
@@ -48,3 +43,8 @@ class ReaderRepository():
     def find_by_email(session: Session, email: str):
         reader = session.query(Reader).filter(Reader.email == email).first()
         return reader
+
+    @staticmethod
+    def find_reader_by_id(session: Session, id_reader:int):
+        query = session.query(Reader).filter(Reader.id == id_reader).first()
+        return query

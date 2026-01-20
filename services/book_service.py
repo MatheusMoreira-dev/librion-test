@@ -22,3 +22,4 @@ class BookService():
             raise BookNotFoundError()
 
         return book
+    

@@ -19,11 +19,12 @@ class LibraryRepository():
         return libraries
 
     @staticmethod
+    def get_by_id(session: Session, library_id:int):
+        query = session.query(Library).filter(Library.id == library_id)
+        return query.first()
+
+    @staticmethod
     def find_by_email(session: Session, email: str):
         library = session.query(Library).filter(Library.email == email).first()
         return library
     
-    @staticmethod
-    def get_by_id(session: Session, library_id:int):
-        query = session.query(Library).filter(Library.id == library_id)
-        return query.first()

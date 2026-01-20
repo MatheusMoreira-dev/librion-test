@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from infrastructure.connectionDB import Base
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 # classe de empréstimos
 class Loan(Base):
